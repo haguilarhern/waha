@@ -4444,6 +4444,7 @@ export namespace messages {
             pollVote?: PollVoteMessage;
             mentions?: string[];
             forward?: ForwardOptions;
+            buttons?: ButtonsMessage;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [11, 13, 19], this.#one_of_decls);
@@ -4507,6 +4508,9 @@ export namespace messages {
                 }
                 if ("forward" in data && data.forward != undefined) {
                     this.forward = data.forward;
+                }
+                if ("buttons" in data && data.buttons != undefined) {
+                    this.buttons = data.buttons;
                 }
             }
         }
@@ -4663,6 +4667,15 @@ export namespace messages {
         get has_forward() {
             return pb_1.Message.getField(this, 20) != null;
         }
+        get buttons() {
+            return pb_1.Message.getWrapperField(this, ButtonsMessage, 21) as ButtonsMessage;
+        }
+        set buttons(value: ButtonsMessage) {
+            pb_1.Message.setWrapperField(this, 21, value);
+        }
+        get has_buttons() {
+            return pb_1.Message.getField(this, 21) != null;
+        }
         static fromObject(data: {
             session?: ReturnType<typeof Session.prototype.toObject>;
             jid?: string;
@@ -4684,6 +4697,7 @@ export namespace messages {
             pollVote?: ReturnType<typeof PollVoteMessage.prototype.toObject>;
             mentions?: string[];
             forward?: ReturnType<typeof ForwardOptions.prototype.toObject>;
+            buttons?: ReturnType<typeof ButtonsMessage.prototype.toObject>;
         }): MessageRequest {
             const message = new MessageRequest({});
             if (data.session != null) {
@@ -4746,6 +4760,9 @@ export namespace messages {
             if (data.forward != null) {
                 message.forward = ForwardOptions.fromObject(data.forward);
             }
+            if (data.buttons != null) {
+                message.buttons = ButtonsMessage.fromObject(data.buttons);
+            }
             return message;
         }
         toObject() {
@@ -4770,6 +4787,7 @@ export namespace messages {
                 pollVote?: ReturnType<typeof PollVoteMessage.prototype.toObject>;
                 mentions?: string[];
                 forward?: ReturnType<typeof ForwardOptions.prototype.toObject>;
+                buttons?: ReturnType<typeof ButtonsMessage.prototype.toObject>;
             } = {};
             if (this.session != null) {
                 data.session = this.session.toObject();
@@ -4831,6 +4849,9 @@ export namespace messages {
             if (this.forward != null) {
                 data.forward = this.forward.toObject();
             }
+            if (this.buttons != null) {
+                data.buttons = this.buttons.toObject();
+            }
             return data;
         }
         serialize(): Uint8Array;
@@ -4877,6 +4898,8 @@ export namespace messages {
                 writer.writeRepeatedString(19, this.mentions);
             if (this.has_forward)
                 writer.writeMessage(20, this.forward, () => this.forward.serialize(writer));
+            if (this.has_buttons)
+                writer.writeMessage(21, this.buttons, () => this.buttons.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -4946,6 +4969,9 @@ export namespace messages {
                     case 20:
                         reader.readMessage(message.forward, () => message.forward = ForwardOptions.deserialize(reader));
                         break;
+                    case 21:
+                        reader.readMessage(message.buttons, () => message.buttons = ButtonsMessage.deserialize(reader));
+                        break;
                     default: reader.skipField();
                 }
             }
@@ -4956,6 +4982,441 @@ export namespace messages {
         }
         static deserializeBinary(bytes: Uint8Array): MessageRequest {
             return MessageRequest.deserialize(bytes);
+        }
+    }
+    export class Button extends pb_1.Message {
+        #one_of_decls: number[][] = [[3], [4], [5], [6]];
+        constructor(data?: any[] | ({
+            type?: string;
+            text?: string;
+        } & (({
+            id?: string;
+        }) | ({
+            url?: string;
+        }) | ({
+            phoneNumber?: string;
+        }) | ({
+            copyCode?: string;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("type" in data && data.type != undefined) {
+                    this.type = data.type;
+                }
+                if ("text" in data && data.text != undefined) {
+                    this.text = data.text;
+                }
+                if ("id" in data && data.id != undefined) {
+                    this.id = data.id;
+                }
+                if ("url" in data && data.url != undefined) {
+                    this.url = data.url;
+                }
+                if ("phoneNumber" in data && data.phoneNumber != undefined) {
+                    this.phoneNumber = data.phoneNumber;
+                }
+                if ("copyCode" in data && data.copyCode != undefined) {
+                    this.copyCode = data.copyCode;
+                }
+            }
+        }
+        get type() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set type(value: string) {
+            pb_1.Message.setField(this, 1, value);
+        }
+        get text() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set text(value: string) {
+            pb_1.Message.setField(this, 2, value);
+        }
+        get id() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set id(value: string) {
+            pb_1.Message.setOneofField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_id() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get url() {
+            return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+        }
+        set url(value: string) {
+            pb_1.Message.setOneofField(this, 4, this.#one_of_decls[1], value);
+        }
+        get has_url() {
+            return pb_1.Message.getField(this, 4) != null;
+        }
+        get phoneNumber() {
+            return pb_1.Message.getFieldWithDefault(this, 5, "") as string;
+        }
+        set phoneNumber(value: string) {
+            pb_1.Message.setOneofField(this, 5, this.#one_of_decls[2], value);
+        }
+        get has_phoneNumber() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        get copyCode() {
+            return pb_1.Message.getFieldWithDefault(this, 6, "") as string;
+        }
+        set copyCode(value: string) {
+            pb_1.Message.setOneofField(this, 6, this.#one_of_decls[3], value);
+        }
+        get has_copyCode() {
+            return pb_1.Message.getField(this, 6) != null;
+        }
+        get _id() {
+            const cases: {
+                [index: number]: "none" | "id";
+            } = {
+                0: "none",
+                3: "id"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [3])];
+        }
+        get _url() {
+            const cases: {
+                [index: number]: "none" | "url";
+            } = {
+                0: "none",
+                4: "url"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [4])];
+        }
+        get _phoneNumber() {
+            const cases: {
+                [index: number]: "none" | "phoneNumber";
+            } = {
+                0: "none",
+                5: "phoneNumber"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [5])];
+        }
+        get _copyCode() {
+            const cases: {
+                [index: number]: "none" | "copyCode";
+            } = {
+                0: "none",
+                6: "copyCode"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [6])];
+        }
+        static fromObject(data: {
+            type?: string;
+            text?: string;
+            id?: string;
+            url?: string;
+            phoneNumber?: string;
+            copyCode?: string;
+        }): Button {
+            const message = new Button({});
+            if (data.type != null) {
+                message.type = data.type;
+            }
+            if (data.text != null) {
+                message.text = data.text;
+            }
+            if (data.id != null) {
+                message.id = data.id;
+            }
+            if (data.url != null) {
+                message.url = data.url;
+            }
+            if (data.phoneNumber != null) {
+                message.phoneNumber = data.phoneNumber;
+            }
+            if (data.copyCode != null) {
+                message.copyCode = data.copyCode;
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                type?: string;
+                text?: string;
+                id?: string;
+                url?: string;
+                phoneNumber?: string;
+                copyCode?: string;
+            } = {};
+            if (this.type != null) {
+                data.type = this.type;
+            }
+            if (this.text != null) {
+                data.text = this.text;
+            }
+            if (this.id != null) {
+                data.id = this.id;
+            }
+            if (this.url != null) {
+                data.url = this.url;
+            }
+            if (this.phoneNumber != null) {
+                data.phoneNumber = this.phoneNumber;
+            }
+            if (this.copyCode != null) {
+                data.copyCode = this.copyCode;
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.type.length)
+                writer.writeString(1, this.type);
+            if (this.text.length)
+                writer.writeString(2, this.text);
+            if (this.has_id)
+                writer.writeString(3, this.id);
+            if (this.has_url)
+                writer.writeString(4, this.url);
+            if (this.has_phoneNumber)
+                writer.writeString(5, this.phoneNumber);
+            if (this.has_copyCode)
+                writer.writeString(6, this.copyCode);
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Button {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Button();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.type = reader.readString();
+                        break;
+                    case 2:
+                        message.text = reader.readString();
+                        break;
+                    case 3:
+                        message.id = reader.readString();
+                        break;
+                    case 4:
+                        message.url = reader.readString();
+                        break;
+                    case 5:
+                        message.phoneNumber = reader.readString();
+                        break;
+                    case 6:
+                        message.copyCode = reader.readString();
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): Button {
+            return Button.deserialize(bytes);
+        }
+    }
+    export class ButtonsMessage extends pb_1.Message {
+        #one_of_decls: number[][] = [[1], [2], [3]];
+        constructor(data?: any[] | ({
+            buttons?: Button[];
+            headerImage?: Media;
+        } & (({
+            header?: string;
+        }) | ({
+            body?: string;
+        }) | ({
+            footer?: string;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [4], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("header" in data && data.header != undefined) {
+                    this.header = data.header;
+                }
+                if ("body" in data && data.body != undefined) {
+                    this.body = data.body;
+                }
+                if ("footer" in data && data.footer != undefined) {
+                    this.footer = data.footer;
+                }
+                if ("buttons" in data && data.buttons != undefined) {
+                    this.buttons = data.buttons;
+                }
+                if ("headerImage" in data && data.headerImage != undefined) {
+                    this.headerImage = data.headerImage;
+                }
+            }
+        }
+        get header() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set header(value: string) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_header() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get body() {
+            return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+        }
+        set body(value: string) {
+            pb_1.Message.setOneofField(this, 2, this.#one_of_decls[1], value);
+        }
+        get has_body() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get footer() {
+            return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+        }
+        set footer(value: string) {
+            pb_1.Message.setOneofField(this, 3, this.#one_of_decls[2], value);
+        }
+        get has_footer() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get buttons() {
+            return pb_1.Message.getRepeatedWrapperField(this, Button, 4) as Button[];
+        }
+        set buttons(value: Button[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 4, value);
+        }
+        get headerImage() {
+            return pb_1.Message.getWrapperField(this, Media, 5) as Media;
+        }
+        set headerImage(value: Media) {
+            pb_1.Message.setWrapperField(this, 5, value);
+        }
+        get has_headerImage() {
+            return pb_1.Message.getField(this, 5) != null;
+        }
+        get _header() {
+            const cases: {
+                [index: number]: "none" | "header";
+            } = {
+                0: "none",
+                1: "header"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1])];
+        }
+        get _body() {
+            const cases: {
+                [index: number]: "none" | "body";
+            } = {
+                0: "none",
+                2: "body"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [2])];
+        }
+        get _footer() {
+            const cases: {
+                [index: number]: "none" | "footer";
+            } = {
+                0: "none",
+                3: "footer"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [3])];
+        }
+        static fromObject(data: {
+            header?: string;
+            body?: string;
+            footer?: string;
+            buttons?: ReturnType<typeof Button.prototype.toObject>[];
+            headerImage?: ReturnType<typeof Media.prototype.toObject>;
+        }): ButtonsMessage {
+            const message = new ButtonsMessage({});
+            if (data.header != null) {
+                message.header = data.header;
+            }
+            if (data.body != null) {
+                message.body = data.body;
+            }
+            if (data.footer != null) {
+                message.footer = data.footer;
+            }
+            if (data.buttons != null) {
+                message.buttons = data.buttons.map(item => Button.fromObject(item));
+            }
+            if (data.headerImage != null) {
+                message.headerImage = Media.fromObject(data.headerImage);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                header?: string;
+                body?: string;
+                footer?: string;
+                buttons?: ReturnType<typeof Button.prototype.toObject>[];
+                headerImage?: ReturnType<typeof Media.prototype.toObject>;
+            } = {};
+            if (this.header != null) {
+                data.header = this.header;
+            }
+            if (this.body != null) {
+                data.body = this.body;
+            }
+            if (this.footer != null) {
+                data.footer = this.footer;
+            }
+            if (this.buttons != null) {
+                data.buttons = this.buttons.map((item: Button) => item.toObject());
+            }
+            if (this.headerImage != null) {
+                data.headerImage = this.headerImage.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_header)
+                writer.writeString(1, this.header);
+            if (this.has_body)
+                writer.writeString(2, this.body);
+            if (this.has_footer)
+                writer.writeString(3, this.footer);
+            if (this.buttons.length)
+                writer.writeRepeatedMessage(4, this.buttons, (item: Button) => item.serialize(writer));
+            if (this.has_headerImage)
+                writer.writeMessage(5, this.headerImage, () => this.headerImage.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ButtonsMessage {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ButtonsMessage();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        message.header = reader.readString();
+                        break;
+                    case 2:
+                        message.body = reader.readString();
+                        break;
+                    case 3:
+                        message.footer = reader.readString();
+                        break;
+                    case 4:
+                        reader.readMessage(message.buttons, () => pb_1.Message.addToRepeatedWrapperField(message, 4, Button.deserialize(reader), Button));
+                        break;
+                    case 5:
+                        reader.readMessage(message.headerImage, () => message.headerImage = Media.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): ButtonsMessage {
+            return ButtonsMessage.deserialize(bytes);
         }
     }
     export class Row extends pb_1.Message {

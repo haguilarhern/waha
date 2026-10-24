@@ -1,8 +1,8 @@
 {
   "waha": {
     "gows": {
-      "repo": "devlikeapro/gows-plus",
-      "ref": "v1.0.48"
+      "repo": "haguilarhern/gows-plus",
+      "ref": "877f203f2ea56e97f8a90f56521d1a87624cc938"
     },
     "dashboard": {
       "repo": "devlikeapro/dashboard",

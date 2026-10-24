@@ -1,5 +1,6 @@
 import { Button, ButtonType } from '@waha/structures/chatting.buttons.dto';
 import esm from '@waha/vendor/esm';
+import { randomBytes } from 'crypto';
 
 function toName(type: ButtonType) {
   switch (type) {
@@ -55,46 +56,50 @@ export async function sendButtonMessage(
   body?: string,
   footer?: string,
 ) {
-  const data = {
-    viewOnceMessage: {
-      message: {
-        messageContextInfo: {
-          deviceListMetadata: {},
-          deviceListMetadataVersion: 2,
-        },
-        interactiveMessage: {
-          body: undefined,
-          header: undefined,
-          footer: undefined,
-          nativeFlowMessage: {
-            buttons: buttons.map(buttonToJson),
-            messageParamsJson: JSON.stringify({
-              from: 'api',
-              templateId: randomId(),
-            }),
-          },
-        },
-      },
+  // Native-flow buttons render on phones only when the stanza carries the
+  // <biz><interactive type="native_flow"> node (plus <bot biz_bot="1"> in 1:1
+  // chats) and the message is NOT wrapped in viewOnceMessage — the wrapper makes
+  // Web/Desktop show a "view once" placeholder and phones drop it silently.
+  // Same recipe as evolution-api PR #2526 and wuzapi; verified on Android 2026-10.
+  const interactiveMessage: any = {
+    body: undefined,
+    header: undefined,
+    footer: undefined,
+    nativeFlowMessage: {
+      buttons: buttons.map(buttonToJson),
+      messageParamsJson: JSON.stringify({
+        from: 'api',
+        templateId: randomId(),
+      }),
     },
   };
 
   if (header || headerImage) {
-    data.viewOnceMessage.message.interactiveMessage.header = {
+    interactiveMessage.header = {
       title: header,
       hasMediaAttachment: !!headerImage,
       imageMessage: headerImage,
     };
   }
   if (body) {
-    data.viewOnceMessage.message.interactiveMessage.body = {
+    interactiveMessage.body = {
       text: body,
     };
   }
   if (footer) {
-    data.viewOnceMessage.message.interactiveMessage.footer = {
+    interactiveMessage.footer = {
       text: footer,
     };
   }
+
+  const data = {
+    messageContextInfo: {
+      deviceListMetadata: {},
+      deviceListMetadataVersion: 2,
+      messageSecret: randomBytes(32),
+    },
+    interactiveMessage: interactiveMessage,
+  };
 
   const msg = esm.b.proto.Message.create(data);
   const fullMessage = esm.b.generateWAMessageFromContent(chatId, msg, {
@@ -102,6 +107,28 @@ export async function sendButtonMessage(
   });
   await sock.relayMessage(chatId, fullMessage.message, {
     messageId: fullMessage.key.id,
+    additionalNodes: interactiveNodes(chatId),
   });
   return fullMessage;
+}
+
+/** Stanza nodes WhatsApp clients require before they render native-flow buttons. */
+export function interactiveNodes(chatId: string) {
+  const nodes: any[] = [
+    {
+      tag: 'biz',
+      attrs: {},
+      content: [
+        {
+          tag: 'interactive',
+          attrs: { type: 'native_flow', v: '1' },
+          content: [{ tag: 'native_flow', attrs: { v: '9', name: 'mixed' } }],
+        },
+      ],
+    },
+  ];
+  if (!chatId.endsWith('@g.us')) {
+    nodes.push({ tag: 'bot', attrs: { biz_bot: '1' } });
+  }
+  return nodes;
 }

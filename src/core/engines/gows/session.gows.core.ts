@@ -109,6 +109,7 @@ import {
   WANumberExistResult,
 } from '@waha/structures/chatting.dto';
 import { SendListRequest } from '@waha/structures/chatting.list.dto';
+import { SendButtonsRequest } from '@waha/structures/chatting.buttons.dto';
 import { ContactQuery, ContactUpdateBody } from '@waha/structures/contacts.dto';
 import {
   ACK_UNKNOWN,
@@ -1209,6 +1210,41 @@ export class WhatsappSessionGoWSCore extends WhatsappSession {
   }
 
   @Activity()
+  @Activity()
+  async sendButtons(request: SendButtonsRequest): Promise<any> {
+    const jid = await this.hooks.wid.chat.promise(request.chatId, 'sendButtons');
+    if (isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)) {
+      throw new UnprocessableEntityException(
+        `Buttons message can only be sent to a direct message chat.`,
+      );
+    }
+    const headerImage = request.headerImage
+      ? await this.fileToMedia(request.headerImage)
+      : undefined;
+    const buttons = messages.ButtonsMessage.fromObject({
+      header: request.header,
+      body: request.body,
+      footer: request.footer,
+      buttons: request.buttons.map((b) => ({
+        type: b.type,
+        text: b.text,
+        id: b.id,
+        url: b.url,
+        phoneNumber: b.phoneNumber,
+        copyCode: b.copyCode,
+      })),
+      headerImage: headerImage,
+    });
+    const message = new messages.MessageRequest({
+      jid: jid,
+      session: this.session,
+      buttons: buttons,
+    });
+    const response = await promisify(this.client.SendMessage)(message);
+    const data = response.toObject();
+    return this.messageResponse(jid, data);
+  }
+
   async sendList(request: SendListRequest): Promise<any> {
     const jid = await this.hooks.wid.chat.promise(request.chatId, 'sendList');
     if (isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)) {

@@ -84,15 +84,18 @@ RUN apt-get update  \
 
 COPY waha.config.json /tmp/waha.config.json
 WORKDIR /go/gows
+# Build GOWS from source (fork with native-flow buttons) at the ref pinned in waha.config.json
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11 && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 RUN \
     GOWS_GITHUB_REPO=$(jq -r '.waha.gows.repo' /tmp/waha.config.json) && \
     GOWS_SHA=$(jq -r '.waha.gows.ref' /tmp/waha.config.json) && \
-    ARCH=$(uname -m) && \
-    if [ "$ARCH" = "x86_64" ]; then ARCH="amd64"; \
-    elif [ "$ARCH" = "aarch64" ]; then ARCH="arm64"; \
-    else echo "Unsupported architecture: $ARCH" && exit 1; fi && \
-    mkdir -p /go/gows/bin && \
-    wget -O /go/gows/bin/gows https://github.com/${GOWS_GITHUB_REPO}/releases/download/${GOWS_SHA}/gows-${ARCH} && \
+    git clone https://github.com/${GOWS_GITHUB_REPO}.git /go/gows/src-repo && \
+    cd /go/gows/src-repo && git checkout --quiet ${GOWS_SHA} && \
+    export PATH=$PATH:/root/go/bin && \
+    make build-proto && \
+    cd src && CGO_ENABLED=1 go build -o /go/gows/bin/gows . && \
     chmod +x /go/gows/bin/gows
 
 
