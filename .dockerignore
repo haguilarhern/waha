@@ -49,3 +49,7 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+node_modules
+dist
+.yarn/cache
+.yarn/install-state.gz
